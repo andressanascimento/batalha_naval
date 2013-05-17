@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1368247792 source:d:\projetos\jogo\main.cpp
+	<allegro.h>
+	<stdio.h>
+	<conio.h>
+	<string.h>
+	<stdlib.h>
+
