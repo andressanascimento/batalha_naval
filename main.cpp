@@ -3,6 +3,7 @@
 #include<conio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <ctype.h>
 
 typedef struct
 {
@@ -240,10 +241,10 @@ void legenda(){
     legenda = load_bitmap("imagens/legenda.bmp", NULL);
     draw_sprite(screen, legenda, 25,500);
 
-    if(navio != ""){
+    if(navio != NULL){
         imprime_letras(navio,3,235,510);
     }
-    if(quadrante!=""){
+    if(quadrante!=NULL){
         imprime_letras(quadrante,3,235,540);
     }
 
@@ -442,12 +443,12 @@ int posicionaNavio(){
         }
     }
 
-    textprintf(screen, font, 150, 560, makecol(255, 0, 0), "coluna__m: %d",coluna_m);
-    textprintf(screen, font, 150, 580, makecol(255, 0, 0), "validacao: %d",coluna_m);
-    textprintf(screen, font, 150, 100, makecol(255, 0, 0), "orientacao: %s",orientacao);
-    textprintf(screen, font, 150, 150, makecol(255, 0, 0), "navio: %s",navio);
+    //textprintf(screen, font, 150, 560, makecol(255, 0, 0), "coluna__m: %d",coluna_m);
+    //textprintf(screen, font, 150, 580, makecol(255, 0, 0), "validacao: %d",coluna_m);
+    //textprintf(screen, font, 150, 100, makecol(255, 0, 0), "orientacao: %s",orientacao);
+    //textprintf(screen, font, 150, 150, makecol(255, 0, 0), "navio: %s",navio);
 
-    char parte[2];
+    char parte[2],l;
     char text_orientacao[2];
     if(int_orientacao == 1){
         strcpy(text_orientacao,"v");
@@ -466,11 +467,12 @@ int posicionaNavio(){
                 linha_m = i;
 
                 if(linha_m <=5){
-                    //parte = linha_m+1;
-                    //snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);
-                    //tabuleiro[0][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
-                    //strcpy(tabuleiro[0][linha_m][coluna].nome_imagem, novoNomeImagem);
-                    //tabuleiro[0][linha_m][coluna].ocupado = 1;
+                    strcpy(parte,itoa(i+1,parte,10));
+                    navio[0] = tolower(navio[0]);
+                    snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);
+                    tabuleiro[0][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
+                    strcpy(tabuleiro[0][linha_m][coluna].nome_imagem, novoNomeImagem);
+                    tabuleiro[0][linha_m][coluna].ocupado = 1;
                 }
             }
             else{//horizontal
@@ -479,17 +481,17 @@ int posicionaNavio(){
                 //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "coluna %s",coluna_m);
                 if(coluna_m <=8){
 
-                    //parte = coluna_m-1;
-
+                    strcpy(parte,itoa(i+1,parte,10));
+                    navio[0] = tolower(navio[0]);
                     //renomear nome das pastas de navio para maiusculo
                     snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio,text_orientacao, navio, parte, text_orientacao);
-                    //tabuleiro[0][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
-                    //strcpy(tabuleiro[0][linha][coluna_m].nome_imagem,novoNomeImagem);
-                    //tabuleiro[0][linha][coluna_m].ocupado =1;
+                    tabuleiro[0][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
+                    strcpy(tabuleiro[0][linha][coluna_m].nome_imagem,novoNomeImagem);
+                    tabuleiro[0][linha][coluna_m].ocupado =1;
                 }
            }
         }
-        textprintf(screen, font, 150, 200, makecol(255, 0, 0), "if %s",novoNomeImagem);
+        //textprintf(screen, font, 150, 200, makecol(255, 0, 0), "if %s",novoNomeImagem);
         //getch();getch();
         return 1;
     }
@@ -504,15 +506,13 @@ void tela_escolhe_navios(){
     fundo_jogo();
     BITMAP *legenda_l;
     legenda_l = load_bitmap("imagens/legenda.bmp", NULL);
-    draw_sprite(buffer, legenda_l, 25,500);
-    draw_sprite(screen, buffer, 0,0);
+    draw_sprite(screen,legenda_l, 25,500);
 
 
     imprime_tabuleiro(0,0);
     BITMAP *legenda_navio;
     legenda_navio = load_bitmap("imagens/navios_legenda.bmp", NULL);
     draw_sprite(screen, legenda_navio, 630,120);
-    destroy_bitmap(legenda_navio);
     int qtt_navios,add;
     qtt_navios = 0;
     while(!key[KEY_ESC]){
@@ -537,17 +537,18 @@ void tela_escolhe_navios(){
             //}
 
             add = posicionaNavio();
-            textprintf(screen, font, 150, 510, makecol(255, 0, 0), "Add: %i",add);
+            //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "Add: %i",add);
 
             if(add == 0){
                 textprintf(screen, font, 150, 510, makecol(255, 0, 0), "%s","O navio não pode ser inserido");
             }
             else{
+                imprime_tabuleiro(0,0);
                 qtt_navios+=1;
                 strcpy(navio,"");
                 strcpy(quadrante,"");
                 strcpy(orientacao,"");
-                legenda();
+                draw_sprite(screen,legenda_l, 25,500);
             }
         }
         sair();
@@ -683,12 +684,8 @@ int main()
     tabuleiro_padrao(0); //tabuleiro do jogador
     tabuleiro_padrao(1); //tabuleiro do computador
     inicia_navio();
-    //tela_inicial();
+    tela_inicial();
     //ataque("A1");
-    lendo_string(navio,3,235,510);
-    lendo_string(quadrante,3,235,540);
-    lendo_string(orientacao,3,235,570);
-    add = posicionaNavio();
 
 
     getch();
