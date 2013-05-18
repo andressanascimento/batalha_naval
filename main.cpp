@@ -22,6 +22,7 @@ typedef struct
     int total_partes;
     int partes_acertadas;
     int destruido;
+    int adicionado;
 }NAVIO;
 
 //variaveis globais
@@ -61,24 +62,24 @@ inline void deinit()
 	allegro_exit();
 }
 
-int retornaLinha(char quadrante[3]){
-    int posicao;
+int retornaColuna(char quadrante[3]){
+    int posicao,i;
+    char letras_ma[] = "ABCDEFGHN";
+    char letras_mi[] = "abcdefghn";
 
-    char letras[] = "ABCDEFGH";
-    int i;
     for(i=0;i<8;i++){
-        if( ((int)quadrante[0]) == ((int)letras[i])){
+        if( (quadrante[0] == letras_ma[i]) || (quadrante[0] == letras_mi[i]) ){
             posicao = i;
-            printf("Posicao: %d",posicao);
+            //printf("Posicao: %d",posicao);
         }
     }
     return posicao;
 }
 
-int retornaColuna(char quadrante[3]){
+int retornaLinha(char quadrante[3]){
     char numero[] = "12345";
     int i,posicao;
-    for(i=0;i<8;i++){
+    for(i=0;i<5;i++){
         if(quadrante[1]==numero[i]){
             posicao = i;
         }
@@ -393,20 +394,22 @@ return 1;
 }
 
 int posicionaNavio(){
-
-    //verifica se os quadrantes não estorou a borda
-    //verifica se os quadrantes onde vai ser inseridos não estão ocupados
-    //se sim troca a imagem
-    //troca a propriedade para ocupado
-    //preenche a variavel navios[0] com os dados do navio
+    //impedir que o usuário insira um navio duas vezes
 
     int linha,coluna,t_partes,i,j,validacao,coluna_m,linha_m,int_orientacao;
     char numero[] = {"0123456789"};
+    char parte[2],l;
+    char text_orientacao[2];
+    int n_navio;
 
     strcpy(quadrante,strupr(quadrante));
+
     linha = retornaLinha(quadrante);
     coluna = retornaColuna(quadrante);
     validacao = 0;
+
+    linha_m = linha;
+    coluna_m = coluna;
 
     char novoNomeImagem[100];
     t_partes = 0;
@@ -415,47 +418,52 @@ int posicionaNavio(){
     for(j=0;j<5;j++){
         if(	strcmp(navio,nome_navio[j]) == 0){
             t_partes = navios[0][j].total_partes;
+            n_navio = j;
         }
     }
 
     int_orientacao = orientacao[1]-48;
-    textprintf(screen, font, 150, 510, makecol(255, 0, 0), "orientacao %i",int_orientacao);
-    textprintf(screen, font, 150, 520, makecol(255, 0, 0), "total_partes %i",t_partes);
-    textprintf(screen, font, 150, 530, makecol(255, 0, 0), "LINHA %d",linha);
-    textprintf(screen, font, 150, 540, makecol(255, 0, 0), "coluna %d",coluna);
+    //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "orientacao %i",int_orientacao);
+    //textprintf(screen, font, 150, 520, makecol(255, 0, 0), "total_partes %i",t_partes);
+
+    //textprintf(screen, font, 150, 140, makecol(255, 0, 0), "Cluna %d",coluna);
 
     for(i=0;i<t_partes;i++){
         if(int_orientacao==1){//vertical
-            linha_m = i;
             if(linha_m <=5){
                 if(tabuleiro[0][linha_m][coluna].ocupado == 1){
                     validacao +=1;
                 }
             }
+            linha_m ++;
         }
         else{//horizontal
-            coluna_m  = i;
             if(coluna_m <=8){
                 if(tabuleiro[0][linha][coluna_m].ocupado == 1){
                     validacao +=1;
                 }
             }
+            coluna_m  ++;
         }
     }
 
+    if(navios[0][n_navio].adicionado == 1){
+        validacao = 1;
+    }
+    linha_m = linha;
+    coluna_m = coluna;
     //textprintf(screen, font, 150, 560, makecol(255, 0, 0), "coluna__m: %d",coluna_m);
     //textprintf(screen, font, 150, 580, makecol(255, 0, 0), "validacao: %d",coluna_m);
     //textprintf(screen, font, 150, 100, makecol(255, 0, 0), "orientacao: %s",orientacao);
     //textprintf(screen, font, 150, 150, makecol(255, 0, 0), "navio: %s",navio);
 
-    char parte[2],l;
-    char text_orientacao[2];
     if(int_orientacao == 1){
         strcpy(text_orientacao,"v");
     }
     else{
         strcpy(text_orientacao,"h");
     }
+
 
     if(validacao > 0){
         return 0;
@@ -464,35 +472,44 @@ int posicionaNavio(){
 
        for(i=0;i<t_partes;i++){
             if(int_orientacao==1){//vertical
-                linha_m = i;
+                strcpy(parte,itoa(i+1,parte,10));
+                navio[0] = tolower(navio[0]);
+                //textprintf(screen, font, 150, 110, makecol(255, 0, 0), "linha %i",linha);
+                //textprintf(screen, font, 150, 210, makecol(255, 0, 0), "coluna %i",coluna_m);
+                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);;
+                tabuleiro[0][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
+                strcpy(tabuleiro[0][linha_m][coluna].nome_imagem, novoNomeImagem);
+                tabuleiro[0][linha_m][coluna].ocupado = 1;
 
-                if(linha_m <=5){
-                    strcpy(parte,itoa(i+1,parte,10));
-                    navio[0] = tolower(navio[0]);
-                    snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);
-                    tabuleiro[0][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
-                    strcpy(tabuleiro[0][linha_m][coluna].nome_imagem, novoNomeImagem);
-                    tabuleiro[0][linha_m][coluna].ocupado = 1;
-                }
+                linha_m += 1;
+                //textprintf(screen, font, 150, 510, makecol(355, 0, 0), "nome %s",novoNomeImagem);
             }
             else{//horizontal
-                coluna_m  = i;
+                strcpy(parte,itoa(i+1,parte,10));
+                navio[0] = tolower(navio[0]);
 
-                //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "coluna %s",coluna_m);
-                if(coluna_m <=8){
+                //renomear nome das pastas de navio para maiusculo
+                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio,text_orientacao, navio, parte, text_orientacao);
+                printf("\ncoluna_m: %d",coluna_m);
+                tabuleiro[0][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
+                strcpy(tabuleiro[0][linha][coluna_m].nome_imagem,novoNomeImagem);
+                tabuleiro[0][linha][coluna_m].ocupado =1;
 
-                    strcpy(parte,itoa(i+1,parte,10));
-                    navio[0] = tolower(navio[0]);
-                    //renomear nome das pastas de navio para maiusculo
-                    snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio,text_orientacao, navio, parte, text_orientacao);
-                    tabuleiro[0][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
-                    strcpy(tabuleiro[0][linha][coluna_m].nome_imagem,novoNomeImagem);
-                    tabuleiro[0][linha][coluna_m].ocupado =1;
-                }
+                coluna_m  += 1;
+
+                //printf("\ncoluna_m: %d",coluna_m);
+                printf("\nlinha: %d",linha);
+                printf("\nimagem: %s",novoNomeImagem);
+                //textprintf(screen, font, 150, 530, makecol(255, 0, 0), "LINHA %i",linha);
+                //textprintf(screen, font, 150, 110, makecol(255, 0, 0), "navio %s",navio);
+                //textprintf(screen, font, 150, 210, makecol(255, 0, 0), "linha %i",linha);
+                //textprintf(screen, font, 150, 310, makecol(255, 0, 0), "coluna_m %i",coluna_m);
+                //textprintf(screen, font, 150, 510, makecol(355, 0, 0), "nome %s",novoNomeImagem);
            }
         }
         //textprintf(screen, font, 150, 200, makecol(255, 0, 0), "if %s",novoNomeImagem);
         //getch();getch();
+        navios[0][n_navio].adicionado = 1;
         return 1;
     }
 }
@@ -541,7 +558,10 @@ void tela_escolhe_navios(){
 
             if(add == 0){
                 textprintf(screen, font, 150, 510, makecol(255, 0, 0), "%s","O navio não pode ser inserido");
-            }
+                strcpy(navio,"");
+                strcpy(quadrante,"");
+                strcpy(orientacao,"");
+                draw_sprite(screen,legenda_l, 25,500);            }
             else{
                 imprime_tabuleiro(0,0);
                 qtt_navios+=1;
@@ -554,6 +574,15 @@ void tela_escolhe_navios(){
         sair();
     }
 }
+
+void tela_ataque(){
+    fundo_jogo();
+    imprime_tabuleiro(1,1);
+    while(!key[KEY_ESC]){
+
+    }
+}
+
 void tela_inicial(){
 
     fundo_jogo();
@@ -566,7 +595,7 @@ void tela_inicial(){
     BITMAP *instrucoes;
     instrucoes = load_bitmap("imagens/instrucoes.bmp", NULL);
     draw_sprite(screen, instrucoes, 307,276);
-    destroy_bitmap(instrucoes);
+    detroy_bitmap(instrucoes);
 
     BITMAP *creditos;
     creditos = load_bitmap("imagens/creditos.bmp", NULL);
@@ -666,6 +695,7 @@ void inicia_navio(){
             strcpy(navios[i][j].nome_navio,nome_navio[j]);
             navios[i][j].partes_acertadas = 0;
             navios[i][j].destruido = 0;
+            navios[i][j].adicionado = 0;
         }
     }
     navios[0][0].total_partes = 1; navios[1][0].total_partes = 1;
@@ -685,8 +715,11 @@ int main()
     tabuleiro_padrao(1); //tabuleiro do computador
     inicia_navio();
     tela_inicial();
-    //ataque("A1");
 
+    //lendo_string(navio,3,235,510);
+    //lendo_string(quadrante,3,235,540);
+    //lendo_string(orientacao,3,235,570);
+    //add = posicionaNavio();
 
     getch();
 

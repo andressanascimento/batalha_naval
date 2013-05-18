@@ -6,3 +6,11 @@
 	<string.h>
 	<stdlib.h>
 
+1368836660 source:d:\projetos\batalha_naval\main.cpp
+	<allegro.h>
+	<stdio.h>
+	<conio.h>
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+
