@@ -379,18 +379,42 @@ void tela_creditos(){
     }
 }
 
-int validaNavio(){
-    return 1;
+int validaNavio(char barco[3]){
+    char vetor[]="N1 N2 N3 N4 N5 n1 n2 n3 n4 n5";  //POSSIBILIDADE DE BARCO , AS PEGUEI E TRANSFORMEI EM UMA STRING
+    if(strstr(vetor,barco))   // STRSTR UMA FUNCAO QUE COMPARA DUAS STRING
+        return 1;
+    return 0;
 }
 
-int validaQuadrante(){
-    return 1;
+int validaQuadrante(char quadrante[3]){
+    char vetor[]="a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 c1 c2 c3 c4 c5 d1 d2 d3 d4 d5 e1 e2 e3 e4 e5 f1 f2 f3 f4 f5 g1 g2 g3 g4 g5 h1 h2 h3 h4 h5 A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 C1 C2 C3 C4 C5  D1 D2 D3 D4 D5 E1 E2 E3 E4 E5 F1 F2 F3 F4 F5 G1 G2 G3 G4 G5  H1 H2 H3 H4 H5 ";
+    if(strstr(vetor,quadrante)){
+        return 1;
+    }
+    return 0;
 }
 
-int validaOrientacao(){
+int validaOrientacao(char orientacao[3]){
+    char vetor[]="01 02 03 04 05";
+    if(strstr(vetor,orientacao)){
+        return 1;
+    }
+    return 0;
+}
 
-return 1;
+void destruiuNavio(int jogador, char navio[3]){
+       int n;
+       switch ( navio[1]){
+       case '1':n=0;break;
+       case '2':n=1;break;
+       case'3':n=2;break;
+       case'4':n=3;break;
+       case'5':n=4;break;
 
+    if(navios[jogador][n].total_partes  == navios[jogador][n].partes_acertadas){
+        navios[jogador][n].destruido = 1;
+    }
+  }
 }
 
 int posicionaNavio(){
@@ -595,7 +619,7 @@ void tela_inicial(){
     BITMAP *instrucoes;
     instrucoes = load_bitmap("imagens/instrucoes.bmp", NULL);
     draw_sprite(screen, instrucoes, 307,276);
-    detroy_bitmap(instrucoes);
+    destroy_bitmap(instrucoes);
 
     BITMAP *creditos;
     creditos = load_bitmap("imagens/creditos.bmp", NULL);
