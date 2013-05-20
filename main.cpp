@@ -502,8 +502,8 @@ int posicionaNavio(int jogador){
 
                 linha_m += 1;
 
-                printf("\ncoluna_m: %d",coluna_m);
-                printf("\nlinha: %d",linha);
+                //printf("\ncoluna_m: %d",coluna_m);
+                //printf("\nlinha: %d",linha);
                 printf("\nimagem: %s",novoNomeImagem);
             }
             else{//horizontal
@@ -511,7 +511,7 @@ int posicionaNavio(int jogador){
                 navio[0] = tolower(navio[0]);
 
                 char nomeImagem[100];
-                strcpy(nomeImagem,tabuleiro[jogador][linha_m][coluna].nome_imagem);
+                strcpy(nomeImagem,tabuleiro[jogador][linha][coluna_m].nome_imagem);
 
                 snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_%c_%s.bmp", navio,text_orientacao, navio, parte,nomeImagem[20],text_orientacao);
                 tabuleiro[jogador][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
@@ -520,8 +520,8 @@ int posicionaNavio(int jogador){
 
                 coluna_m  += 1;
 
-                printf("\ncoluna_m: %d",coluna_m);
-                printf("\nlinha: %d",linha);
+                //printf("\ncoluna_m: %d",coluna_m);
+                //printf("\nlinha: %d",linha);
                 printf("\nimagem: %s",novoNomeImagem);
 
            }
