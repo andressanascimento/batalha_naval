@@ -1,8 +1,9 @@
 #include <allegro.h>
-#include<stdio.h>
-#include<conio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <conio.h>
+#include <string.h>
 #include <ctype.h>
 
 typedef struct
@@ -417,7 +418,7 @@ void destruiuNavio(int jogador, char navio[3]){
   }
 }
 
-int posicionaNavio(){
+int posicionaNavio(int jogador){
     //impedir que o usuário insira um navio duas vezes
 
     int linha,coluna,t_partes,i,j,validacao,coluna_m,linha_m,int_orientacao;
@@ -425,7 +426,7 @@ int posicionaNavio(){
     char parte[2],l;
     char text_orientacao[2];
     int n_navio;
-
+    char nome_do_navio[100];
     strcpy(quadrante,strupr(quadrante));
 
     linha = retornaLinha(quadrante);
@@ -441,16 +442,12 @@ int posicionaNavio(){
     strcpy(navio,strupr(navio));
     for(j=0;j<5;j++){
         if(	strcmp(navio,nome_navio[j]) == 0){
-            t_partes = navios[0][j].total_partes;
+            t_partes = navios[jogador][j].total_partes;
             n_navio = j;
         }
     }
 
     int_orientacao = orientacao[1]-48;
-    //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "orientacao %i",int_orientacao);
-    //textprintf(screen, font, 150, 520, makecol(255, 0, 0), "total_partes %i",t_partes);
-
-    //textprintf(screen, font, 150, 140, makecol(255, 0, 0), "Cluna %d",coluna);
 
     for(i=0;i<t_partes;i++){
         if(int_orientacao==1){//vertical
@@ -463,7 +460,7 @@ int posicionaNavio(){
         }
         else{//horizontal
             if(coluna_m <=8){
-                if(tabuleiro[0][linha][coluna_m].ocupado == 1){
+                if(tabuleiro[jogador][linha][coluna_m].ocupado == 1){
                     validacao +=1;
                 }
             }
@@ -471,15 +468,11 @@ int posicionaNavio(){
         }
     }
 
-    if(navios[0][n_navio].adicionado == 1){
+    if(navios[jogador][n_navio].adicionado == 1){
         validacao = 1;
     }
     linha_m = linha;
     coluna_m = coluna;
-    //textprintf(screen, font, 150, 560, makecol(255, 0, 0), "coluna__m: %d",coluna_m);
-    //textprintf(screen, font, 150, 580, makecol(255, 0, 0), "validacao: %d",coluna_m);
-    //textprintf(screen, font, 150, 100, makecol(255, 0, 0), "orientacao: %s",orientacao);
-    //textprintf(screen, font, 150, 150, makecol(255, 0, 0), "navio: %s",navio);
 
     if(int_orientacao == 1){
         strcpy(text_orientacao,"v");
@@ -498,42 +491,42 @@ int posicionaNavio(){
             if(int_orientacao==1){//vertical
                 strcpy(parte,itoa(i+1,parte,10));
                 navio[0] = tolower(navio[0]);
-                //textprintf(screen, font, 150, 110, makecol(255, 0, 0), "linha %i",linha);
-                //textprintf(screen, font, 150, 210, makecol(255, 0, 0), "coluna %i",coluna_m);
-                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);;
-                tabuleiro[0][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
-                strcpy(tabuleiro[0][linha_m][coluna].nome_imagem, novoNomeImagem);
-                tabuleiro[0][linha_m][coluna].ocupado = 1;
+
+                char nomeImagem[100];
+                strcpy(nomeImagem,tabuleiro[jogador][linha_m][coluna].nome_imagem);
+
+                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_%c_%s.bmp", navio, text_orientacao, navio, parte,nomeImagem[20],text_orientacao);
+                tabuleiro[jogador][linha_m][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
+                strcpy(tabuleiro[jogador][linha_m][coluna].nome_imagem, novoNomeImagem);
+                tabuleiro[jogador][linha_m][coluna].ocupado = 1;
 
                 linha_m += 1;
-                //textprintf(screen, font, 150, 510, makecol(355, 0, 0), "nome %s",novoNomeImagem);
+
+                printf("\ncoluna_m: %d",coluna_m);
+                printf("\nlinha: %d",linha);
+                printf("\nimagem: %s",novoNomeImagem);
             }
             else{//horizontal
                 strcpy(parte,itoa(i+1,parte,10));
                 navio[0] = tolower(navio[0]);
 
-                //renomear nome das pastas de navio para maiusculo
-                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio,text_orientacao, navio, parte, text_orientacao);
-                printf("\ncoluna_m: %d",coluna_m);
-                tabuleiro[0][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
-                strcpy(tabuleiro[0][linha][coluna_m].nome_imagem,novoNomeImagem);
-                tabuleiro[0][linha][coluna_m].ocupado =1;
+                char nomeImagem[100];
+                strcpy(nomeImagem,tabuleiro[jogador][linha_m][coluna].nome_imagem);
+
+                snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_%c_%s.bmp", navio,text_orientacao, navio, parte,nomeImagem[20],text_orientacao);
+                tabuleiro[jogador][linha][coluna_m].imagem = load_bitmap(novoNomeImagem,NULL);
+                strcpy(tabuleiro[jogador][linha][coluna_m].nome_imagem,novoNomeImagem);
+                tabuleiro[jogador][linha][coluna_m].ocupado =1;
 
                 coluna_m  += 1;
 
-                //printf("\ncoluna_m: %d",coluna_m);
+                printf("\ncoluna_m: %d",coluna_m);
                 printf("\nlinha: %d",linha);
                 printf("\nimagem: %s",novoNomeImagem);
-                //textprintf(screen, font, 150, 530, makecol(255, 0, 0), "LINHA %i",linha);
-                //textprintf(screen, font, 150, 110, makecol(255, 0, 0), "navio %s",navio);
-                //textprintf(screen, font, 150, 210, makecol(255, 0, 0), "linha %i",linha);
-                //textprintf(screen, font, 150, 310, makecol(255, 0, 0), "coluna_m %i",coluna_m);
-                //textprintf(screen, font, 150, 510, makecol(355, 0, 0), "nome %s",novoNomeImagem);
+
            }
         }
-        //textprintf(screen, font, 150, 200, makecol(255, 0, 0), "if %s",novoNomeImagem);
-        //getch();getch();
-        navios[0][n_navio].adicionado = 1;
+        navios[jogador][n_navio].adicionado = 1;
         return 1;
     }
 }
@@ -563,21 +556,30 @@ void tela_escolhe_navios(){
             strcpy(orientacao,"");
 
             lendo_string(navio,3,235,510);
-            //while(validaNavio()!=1){
-               //lendo_string(navio,3,235,510);
-            //}
+            while(validaNavio(navio)!=1){
+               textprintf(screen, font, 150, 510, makecol(255, 0, 0), "%s","O navio digitado não existe!");
+               strcpy(navio,"");
+               legenda();
+               lendo_string(navio,3,235,510);
+            }
 
             lendo_string(quadrante,3,235,540);
-            //while(validaQuadrante()!=1){
-                //lendo_string(quadrante,3,235,540);
-            //}
+            while(validaQuadrante(quadrante)!=1){
+                textprintf(screen, font, 150, 510, makecol(255, 0, 0), "%s","O quadrante digitado não existe!");
+                strcpy(quadrante,"");
+                legenda();
+                lendo_string(quadrante,3,235,540);
+            }
 
             lendo_string(orientacao,3,235,570);
-            //while(validaOrientacao()){
-               //lendo_string(orientacao,3,235,570);
-            //}
+            while(validaOrientacao(orientacao)!=1){
+                textprintf(screen, font, 150, 510, makecol(255, 0, 0), "%s","Digite um código válido!");
+                strcpy(quadrante,"");
+                legenda();
+                lendo_string(orientacao,3,235,570);
+            }
 
-            add = posicionaNavio();
+            add = posicionaNavio(0);
             //textprintf(screen, font, 150, 510, makecol(255, 0, 0), "Add: %i",add);
 
             if(add == 0){
@@ -597,6 +599,53 @@ void tela_escolhe_navios(){
         }
         sair();
     }
+}
+
+void posicionarNaviosComputador(){
+   //Enquanto todos os navios não forem preenchidos
+   //sortear um quadrante e  orientacao
+  //verificar se os quadrantes estão ocupados
+  //se sim sortear de novo
+  //se não posicionar navios: trocar imagens
+  //trocar caminho da imagem
+  //marcar como ocupado os quadrantes
+  //preencher a variavel navios[1] com as informações
+    //random(10);
+    int nav = 1;
+    int add = 0;
+    int valida = 0;
+    char rand_letras[] = "ABCDEFGH";
+    char rand_numeros[] = "12345";
+    char rand_orientacao[2][3];
+    strcpy(rand_orientacao[0],"01");
+    strcpy(rand_orientacao[1],"02");
+    while(nav<=5){
+        srand(time(NULL));
+        int r_l = rand() %8;
+        int r_n = rand() %5;
+        int r_nav = rand() %2;
+
+        char q[] = {rand_letras[r_l]+'\0', rand_numeros[r_n]+'\0'};
+        char n[] = {'n\0',rand_numeros[nav]};
+        char o[3];
+        //strcpy(o,);
+
+        strcpy(navio,n);
+        strcpy(orientacao,rand_orientacao[r_nav]);
+
+        valida = validaQuadrante(q);
+        if(valida == 0){
+            strcpy(quadrante,q);
+
+            add = posicionaNavio(1);
+            if(add == 1){
+                nav++;
+            }
+        }
+    }
+    strcpy(quadrante,"");
+    strcpy(navio,"");
+    strcpy(orientacao,"");
 }
 
 void tela_ataque(){
@@ -663,19 +712,9 @@ void tela_inicial(){
     }
 }
 
-int verificaAtaque(char quadrante[3]){
-
-//retorna 0 [0 para que não encontrou navio]
-return 1;
-
-//ou retorna 1 [se encontrou o navio]
-//return 1;
-}
-
 void ataque(char quadrante[3]){
     tabuleiro[0][0][0].imagem = load_bitmap("imagens/n1/h/n1_1_cl_h.bmp",NULL);
     strcpy(tabuleiro[0][0][0].nome_imagem,"imagens/n1/h/n1_1_cl_h.bmp");
-    verificaAtaque(quadrante);
 
     int linha, coluna;
     char nomeImagem[60];
@@ -705,8 +744,8 @@ void ataque(char quadrante[3]){
     }
     else{
 // TODO: Fazer quando tiver pronto o BITMAP do Allegro
-        tabuleiro[0][linha][coluna].imagem = load_bitmap("imagens/tabuleiro/q_la2.bmp",NULL);
-        strcpy(tabuleiro[0][linha][coluna].nome_imagem, "imagens/tabuleiro/q_la2.bmp");
+        tabuleiro[0][linha][coluna].imagem = load_bitmap("imagens/tabuleiro/q_la.bmp",NULL);
+        strcpy(tabuleiro[0][linha][coluna].nome_imagem, "imagens/tabuleiro/q_la.bmp");
     }
     //imprime_tabuleiro();
 }
@@ -734,20 +773,24 @@ int main()
     fundo_jogo();
     strcpy(nome_navio[0],"N1");strcpy(nome_navio[1],"N2");strcpy(nome_navio[2],"N3");strcpy(nome_navio[3],"N4");strcpy(nome_navio[4],"N5");
 
-    int add;
+    //int add;
     tabuleiro_padrao(0); //tabuleiro do jogador
     tabuleiro_padrao(1); //tabuleiro do computador
     inicia_navio();
-    tela_inicial();
 
+    //printf("rand_letra %c",rand_letras[r_l]);
+    //printf("rand_numero %c",rand_numeros[r_n]);
+    //printf("\nr_l %d",r_l);
+    //printf("\nr_n %d",r_n);
+    //printf("quadrante: %s",quadrante);
+
+    tela_inicial();
     //lendo_string(navio,3,235,510);
     //lendo_string(quadrante,3,235,540);
     //lendo_string(orientacao,3,235,570);
     //add = posicionaNavio();
 
-    getch();
-
-
+    //posicionarNaviosComputador();
 	deinit();
 	return 0;
 

@@ -1,16 +1,10 @@
 # depslib dependency file v1.0
-1368747038 source:d:\projetos\jogo\main.cpp
+1369070734 source:d:\projetos\batalha_naval\main.cpp
 	<allegro.h>
 	<stdio.h>
+	<stdlib.h>
+	<time.h>
 	<conio.h>
 	<string.h>
-	<stdlib.h>
-
-1368836660 source:d:\projetos\batalha_naval\main.cpp
-	<allegro.h>
-	<stdio.h>
-	<conio.h>
-	<string.h>
-	<stdlib.h>
 	<ctype.h>
 
