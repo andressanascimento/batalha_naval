@@ -520,8 +520,8 @@ int posicionaNavio(int jogador){
 
                 coluna_m  += 1;
 
-                //printf("\ncoluna_m: %d",coluna_m);
-                //printf("\nlinha: %d",linha);
+                printf("\ncoluna_m: %d",coluna_m);
+                printf("\nlinha: %d",linha);
                 printf("\nimagem: %s",novoNomeImagem);
 
            }
