@@ -6,6 +6,9 @@
 #include <string.h>
 #include <ctype.h>
 
+int eu = 0;
+int pc = 0;
+
 typedef struct
 {
     BITMAP *imagem;
@@ -21,10 +24,27 @@ typedef struct
 {
     char nome_navio[3];
     int total_partes;
-    int partes_acertadas;
-    int destruido;
     int adicionado;
 }NAVIO;
+
+void Randomize(void)
+{
+    srand((int) time(NULL));
+}
+
+int RandomInteger(int low, int high)
+{
+    int k;
+    double d;
+
+    d = (double) rand() / ((double) RAND_MAX + 1);
+    k = (int) (d * (high - low + 1));
+    return (low + k);
+}
+
+int cont_q;
+int vez = 0;
+int telaAtaque = 0;
 
 //variaveis globais
 BITMAP *fundo;
@@ -39,6 +59,9 @@ TABULEIRO tabuleiro[2][5][8];
 NAVIO navios[2][5];
 //int tabuleiro[5][8][2];
 //BITMAP *tabuleiro_imagem[5][7];
+
+void ataque(char quadrante[3],int jogador);
+int ataqueComputador();
 
 char navio[3],orientacao[3],quadrante[3];
 char nome_navio[5][3];
@@ -86,6 +109,63 @@ int retornaLinha(char quadrante[3]){
         }
     }
     return posicao;
+}
+
+void randomQuadrante(){
+    Randomize();
+    int random_letras[100] = {
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),
+                            RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7),RandomInteger(0,7)
+                        };
+
+    int random_numeros[100] = {
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),
+                            RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4),RandomInteger(0,4)
+                        };
+
+    char rand_letras[] = "ABCDEFGH";
+    char rand_numeros[] = "12345";
+    int r_l = random_letras[random_letras[cont_q]];
+    int r_n= random_numeros[random_numeros[cont_q]];
+    if(cont_q>95){
+        cont_q=0;
+    }
+    else{
+        cont_q++;
+    }
+
+    //printf("\nletra :%d ",r_l);
+    //printf("\nnumero: %d ",r_n);
+    char q[5] = {rand_letras[r_l]+'\0', rand_numeros[r_n]+'\0'};
+    strcpy(quadrante,q);
 }
 
 //funcoes complexas para o jogo
@@ -153,7 +233,7 @@ void tabuleiro_padrao(int jogador){
                     //strcpy(tabuleiro_imagem[linha][coluna],"q_es");
                     tabuleiro[jogador][linha][coluna].imagem = load_bitmap("imagens/tabuleiro/q_es2.bmp", NULL);
                     strcpy(tabuleiro[jogador][linha][coluna].nome_imagem,"imagens/tabuleiro/q_es2.bmp");
-                    strcpy(tabuleiro[jogador][linha][coluna].nome_imagem_padrao,"imagens/tabuleiro/q_cl2.bmp");
+                    strcpy(tabuleiro[jogador][linha][coluna].nome_imagem_padrao,"imagens/tabuleiro/q_es2.bmp");
                     x = x+72;
                 }
             }
@@ -239,15 +319,23 @@ void imprime_letras(char vetor[3],int tamanho,int x, int y){
 }
 
 void legenda(){
-    BITMAP *legenda;
-    legenda = load_bitmap("imagens/legenda.bmp", NULL);
-    draw_sprite(screen, legenda, 25,500);
 
-    if(navio != NULL){
-        imprime_letras(navio,3,235,510);
+    if(telaAtaque == 1){
+        BITMAP *legenda_l;
+        legenda_l = load_bitmap("imagens/legenda_ataque.bmp", NULL);
+        draw_sprite(screen,legenda_l, 25,500);
     }
-    if(quadrante!=NULL){
-        imprime_letras(quadrante,3,235,540);
+    else{
+        BITMAP *legenda;
+        legenda = load_bitmap("imagens/legenda.bmp", NULL);
+        draw_sprite(screen, legenda, 25,500);
+
+        if(navio != NULL){
+            imprime_letras(navio,3,235,510);
+        }
+        if(quadrante!=NULL){
+            imprime_letras(quadrante,3,235,540);
+        }
     }
 
 }
@@ -327,6 +415,7 @@ void lendo_string(char *vetor, int tamanho, int x_ini, int y_ini)
 
 void sair(){
     if((mouse_x>= 675)&&(mouse_x <= 753)&&(mouse_y <= 95)&&(mouse_y >= 54))
+    //if(mouse_x>= 675)
     {
         if(mouse_b & 1)
             {
@@ -335,20 +424,25 @@ void sair(){
     }
 }
 
+void tela_inicial();
+
 void menu()
 {
+    select_mouse_cursor(1); //cursor do mouse
+    show_mouse(screen); // mostra o cursor
+
     while(!key[KEY_ESC]){
         BITMAP *menu;
-        textprintf(screen, font, 20, 110, makecol(255, 0, 0), "X: %d Y: %d", mouse_x,mouse_y);
+        //textprintf(screen, font, 20, 110, makecol(255, 0, 0), "X: %d Y: %d", mouse_x,mouse_y);
         menu = load_bitmap("imagens/voltar.bmp", NULL);
-        draw_sprite(screen,menu, 300,496);
+        draw_sprite(screen,menu, 650,496);
         destroy_bitmap(menu);
         //if((mouse_x>= 675)&&(mouse_x <=753)&&(mouse_y <=150)&&(mouse_y >=347))
-        if(mouse_x > 400)
+        if((mouse_x >= 600)and (mouse_x<=800)and (mouse_y>=496)and (mouse_y<=590))
         {
             if(mouse_b & 1)
             {
-                exit(0);
+                tela_inicial();
             }
         }
     }
@@ -371,12 +465,12 @@ void tela_creditos(){
 
     fundo_jogo();
     while(!key[KEY_ESC]){
+        sair();
         BITMAP *credito_jogo;
         credito_jogo = load_bitmap("imagens/credito/credito_jogo.bmp", NULL);
         draw_sprite(screen, credito_jogo, 137,158);
         destroy_bitmap(credito_jogo);
         menu();
-        sair();
     }
 }
 
@@ -403,24 +497,7 @@ int validaOrientacao(char orientacao[3]){
     return 0;
 }
 
-void destruiuNavio(int jogador, char navio[3]){
-       int n;
-       switch ( navio[1]){
-       case '1':n=0;break;
-       case '2':n=1;break;
-       case'3':n=2;break;
-       case'4':n=3;break;
-       case'5':n=4;break;
-
-    if(navios[jogador][n].total_partes  == navios[jogador][n].partes_acertadas){
-        navios[jogador][n].destruido = 1;
-    }
-  }
-}
-
 int posicionaNavio(int jogador){
-    //impedir que o usuário insira um navio duas vezes
-
     int linha,coluna,t_partes,i,j,validacao,coluna_m,linha_m,int_orientacao;
     char numero[] = {"0123456789"};
     char parte[2],l;
@@ -435,7 +512,7 @@ int posicionaNavio(int jogador){
 
     linha_m = linha;
     coluna_m = coluna;
-
+    validacao = 0;
     char novoNomeImagem[100];
     t_partes = 0;
 
@@ -448,31 +525,36 @@ int posicionaNavio(int jogador){
     }
 
     int_orientacao = orientacao[1]-48;
-
-    for(i=0;i<t_partes;i++){
+    i = 0;
+    while(i<t_partes){
         if(int_orientacao==1){//vertical
-            if(linha_m <=5){
-                if(tabuleiro[0][linha_m][coluna].ocupado == 1){
-                    validacao +=1;
+            if(linha_m < 5){
+                if(tabuleiro[jogador][linha_m][coluna].ocupado == 1){
+                    validacao++;
                 }
+                linha_m++;
             }
-            linha_m ++;
+            else{
+                validacao++;
+            }
         }
         else{//horizontal
-            if(coluna_m <=8){
+            if(coluna_m <8){
                 if(tabuleiro[jogador][linha][coluna_m].ocupado == 1){
-                    validacao +=1;
+                    validacao++;
                 }
+                coluna_m++;
             }
-            coluna_m  ++;
+            else{
+                validacao++;
+            }
         }
+        i++;
     }
 
     if(navios[jogador][n_navio].adicionado == 1){
         validacao = 1;
     }
-    linha_m = linha;
-    coluna_m = coluna;
 
     if(int_orientacao == 1){
         strcpy(text_orientacao,"v");
@@ -481,12 +563,12 @@ int posicionaNavio(int jogador){
         strcpy(text_orientacao,"h");
     }
 
-
     if(validacao > 0){
         return 0;
     }
     else{
-
+       linha_m = linha;
+       coluna_m = coluna;
        for(i=0;i<t_partes;i++){
             if(int_orientacao==1){//vertical
                 strcpy(parte,itoa(i+1,parte,10));
@@ -500,11 +582,14 @@ int posicionaNavio(int jogador){
                 strcpy(tabuleiro[jogador][linha_m][coluna].nome_imagem, novoNomeImagem);
                 tabuleiro[jogador][linha_m][coluna].ocupado = 1;
 
-                linha_m += 1;
-
+                //printf("\n\norientacao: %d",int_orientacao);
                 //printf("\ncoluna_m: %d",coluna_m);
                 //printf("\nlinha: %d",linha);
-                printf("\nimagem: %s",novoNomeImagem);
+                //printf("\nquadrante: %s",quadrante);
+                //printf("\nimagem: %s",novoNomeImagem);
+
+                linha_m += 1;
+
             }
             else{//horizontal
                 strcpy(parte,itoa(i+1,parte,10));
@@ -518,16 +603,102 @@ int posicionaNavio(int jogador){
                 strcpy(tabuleiro[jogador][linha][coluna_m].nome_imagem,novoNomeImagem);
                 tabuleiro[jogador][linha][coluna_m].ocupado =1;
 
-                coluna_m  += 1;
+                //printf("\n\norientacao: %d",int_orientacao);
+                //printf("\ncoluna_m: %d",coluna_m);
+                //printf("\nlinha: %d",linha);
+                //printf("\nquadrante: %s",quadrante);
+                //printf("\nimagem: %s",novoNomeImagem);
 
-                printf("\ncoluna_m: %d",coluna_m);
-                printf("\nlinha: %d",linha);
-                printf("\nimagem: %s",novoNomeImagem);
+                coluna_m  += 1;
 
            }
         }
         navios[jogador][n_navio].adicionado = 1;
         return 1;
+    }
+}
+
+void telaGanhou(int jogador){
+    fundo_jogo();
+	BITMAP *imagem;
+
+    //supondo que retorna o ganhador
+    while(!key[KEY_ESC]){
+
+        if(jogador == 0){
+            imagem = load_bitmap("imagens/voce_ganhou.bmp",NULL);
+        }
+        else{
+            imagem = load_bitmap("imagens/voce_perdeu.bmp",NULL);
+        }
+
+        draw_sprite(screen,imagem,200,200);
+    }
+	exit(0);
+}
+
+void tela_ataque(){
+    fundo_jogo();
+    telaAtaque = 1;
+
+    BITMAP *legenda_l;
+    BITMAP *vez_imagem;
+    legenda_l = load_bitmap("imagens/legenda_ataque.bmp", NULL);
+
+    while(!key[KEY_ESC]){
+        sair();
+        imprime_tabuleiro(vez,1);
+        //vez do jogador
+        if(vez == 0){
+            vez_imagem = load_bitmap("imagens/sua_vez.bmp", NULL);
+            draw_sprite(screen,vez_imagem, 670,155);
+
+            imprime_tabuleiro(1,1);
+
+            draw_sprite(screen,legenda_l, 25,500);
+            lendo_string(quadrante,3,240,513);
+            while(validaQuadrante(quadrante)!=1){
+               lendo_string(quadrante,3,240,513);
+            }
+            int linha,coluna;
+            linha = retornaLinha(quadrante);
+            coluna = retornaColuna(quadrante);
+
+            if(tabuleiro[1][linha][coluna].visivel==0){
+                ataque(quadrante,1);
+                imprime_tabuleiro(1,1);
+                if(eu == 9){
+                    telaGanhou(0);
+                }
+                else{
+                    vez = 1;
+                }
+                rest(400);
+            }
+            else{
+                lendo_string(quadrante,3,240,513);
+                while(validaQuadrante(quadrante)!=1){
+                    lendo_string(quadrante,3,240,513);
+                }
+            }
+        }
+        else{
+            fundo_jogo();
+            vez_imagem = load_bitmap("imagens/computador.bmp", NULL);
+            draw_sprite(screen,vez_imagem, 670,155);
+            imprime_tabuleiro(0,1);
+            rest(1800);
+            ataqueComputador();
+            imprime_tabuleiro(0,1);
+
+            if(pc==9){
+                telaGanhou(1);
+            }
+            else{
+                vez = 0;
+            }
+            rest(1800);
+        }
     }
 }
 
@@ -550,6 +721,7 @@ void tela_escolhe_navios(){
     int qtt_navios,add;
     qtt_navios = 0;
     while(!key[KEY_ESC]){
+        sair();
         while(qtt_navios < 5){
             strcpy(navio,"");
             strcpy(quadrante,"");
@@ -587,9 +759,35 @@ void tela_escolhe_navios(){
                 strcpy(navio,"");
                 strcpy(quadrante,"");
                 strcpy(orientacao,"");
-                draw_sprite(screen,legenda_l, 25,500);            }
+            }
             else{
                 imprime_tabuleiro(0,0);
+                BITMAP *colocou;
+                if(navio[1]=='1'){
+                    colocou = load_bitmap("imagens/colocou_n1.bmp", NULL);
+                    draw_sprite(screen,colocou,670,155);
+                }
+                if(navio[1]=='2'){
+                    colocou = load_bitmap("imagens/colocou_n2.bmp", NULL);
+                    draw_sprite(screen,colocou,680,210);
+                }
+                if(navio[1]=='3'){
+                    colocou = load_bitmap("imagens/colocou_n3.bmp", NULL);
+                    draw_sprite(screen,colocou,685,270);
+                }
+                if(navio[1]=='4'){
+                    colocou = load_bitmap("imagens/colocou_n4.bmp", NULL);
+                    draw_sprite(screen,colocou,680,330);
+                }
+                if(navio[1]=='5'){
+                    colocou = load_bitmap("imagens/colocou_n5.bmp", NULL);
+                    draw_sprite(screen,colocou,660,400);
+                }
+
+
+
+
+
                 qtt_navios+=1;
                 strcpy(navio,"");
                 strcpy(quadrante,"");
@@ -597,62 +795,55 @@ void tela_escolhe_navios(){
                 draw_sprite(screen,legenda_l, 25,500);
             }
         }
+        printf("%d",qtt_navios);
+        rest(600);
+        //break;
+        tela_ataque();
         sair();
     }
 }
 
 void posicionarNaviosComputador(){
-   //Enquanto todos os navios não forem preenchidos
-   //sortear um quadrante e  orientacao
-  //verificar se os quadrantes estão ocupados
-  //se sim sortear de novo
-  //se não posicionar navios: trocar imagens
-  //trocar caminho da imagem
-  //marcar como ocupado os quadrantes
-  //preencher a variavel navios[1] com as informações
-    //random(10);
-    int nav = 1;
+
+    strcpy(quadrante,"");
+    strcpy(navio,"");
+    strcpy(orientacao,"");
+    int r_nav;
+    int nav = 0;
     int add = 0;
     int valida = 0;
-    char rand_letras[] = "ABCDEFGH";
-    char rand_numeros[] = "12345";
+    char o[3];
     char rand_orientacao[2][3];
+    char rand_numeros[] = {"12345"};
     strcpy(rand_orientacao[0],"01");
     strcpy(rand_orientacao[1],"02");
-    while(nav<=5){
-        srand(time(NULL));
-        int r_l = rand() %8;
-        int r_n = rand() %5;
-        int r_nav = rand() %2;
+    while(nav<5){
+        r_nav = 0;
+        strcpy(navio,"");
+        strcpy(orientacao,"");
+        strcpy(quadrante,"");
+        r_nav = rand() %2;
 
-        char q[] = {rand_letras[r_l]+'\0', rand_numeros[r_n]+'\0'};
-        char n[] = {'n\0',rand_numeros[nav]};
+        char n[5] = {'n'+'\0',rand_numeros[nav]+'\0'};
         char o[3];
         //strcpy(o,);
 
         strcpy(navio,n);
         strcpy(orientacao,rand_orientacao[r_nav]);
 
-        valida = validaQuadrante(q);
-        if(valida == 0){
-            strcpy(quadrante,q);
+        randomQuadrante();
+        valida = validaQuadrante(quadrante);
+        if(valida == 1){
 
+            printf("\nadd antes: %d",add);
             add = posicionaNavio(1);
+            printf("\nadd despois: %d",add);
+
             if(add == 1){
                 nav++;
+                add=0;
             }
         }
-    }
-    strcpy(quadrante,"");
-    strcpy(navio,"");
-    strcpy(orientacao,"");
-}
-
-void tela_ataque(){
-    fundo_jogo();
-    imprime_tabuleiro(1,1);
-    while(!key[KEY_ESC]){
-
     }
 }
 
@@ -679,7 +870,7 @@ void tela_inicial(){
     show_mouse(screen); // mostra o cursor
 
     while (!key[KEY_ESC]){
-      textprintf(screen, font, 20, 110, makecol(255, 0, 0), "X: %d Y: %d", mouse_x,mouse_y);
+      //textprintf(screen, font, 20, 110, makecol(255, 0, 0), "X: %d Y: %d", mouse_x,mouse_y);
       if((mouse_x >= 315) &&(mouse_x <=485) &&(mouse_y >=277) &&(mouse_y <= 427))
           {
           if (mouse_b & 1)
@@ -696,11 +887,11 @@ void tela_inicial(){
             {
                 rest(1000);
                 clear(screen);
-                tela_instrucoes();
+                tela_creditos();
                 break;
             }
       }
-      if((mouse_x>= 315)and (mouse_x<=485) and (mouse_y >=200) and (mouse_y <= 390)){
+      if((mouse_x>= 315)and (mouse_x<=485) and (mouse_y >=200) and (mouse_y <= 250)){
           if (mouse_b & 1)
             {
                 rest(1000);
@@ -709,45 +900,83 @@ void tela_inicial(){
                 break;
             }
       }
+      sair();
     }
 }
 
-void ataque(char quadrante[3]){
-    tabuleiro[0][0][0].imagem = load_bitmap("imagens/n1/h/n1_1_cl_h.bmp",NULL);
-    strcpy(tabuleiro[0][0][0].nome_imagem,"imagens/n1/h/n1_1_cl_h.bmp");
+void ataque(char quadrante[3],int jogador){
+    //tabuleiro[0][0][0].imagem = load_bitmap("imagens/n1/h/n1_1_cl_h.bmp",NULL);
+    //strcpy(tabuleiro[0][0][0].nome_imagem,"imagens/n1/h/n1_1_cl_h.bmp");
 
     int linha, coluna;
-    char nomeImagem[60];
+    char nomeImagem[60],orientacao[3];
 
     linha = retornaLinha(quadrante);
     coluna = retornaColuna(quadrante);
 
-    if (tabuleiro[0][linha][coluna].ocupado == 1) {
-        strcpy(nomeImagem, tabuleiro[0][linha][coluna].nome_imagem);
+    if (tabuleiro[jogador][linha][coluna].ocupado == 1) {
+        strcpy(nomeImagem, tabuleiro[jogador][linha][coluna].nome_imagem);
 
         char navio[3] = { nomeImagem[13]+'\0', nomeImagem[14]+'\0' };
         char parte[2] = { nomeImagem[16]+'\0' };
-        char orientacao[2] = { nomeImagem[21]+'\0' };
+        char orientacao[2] = { nomeImagem[20]+'\0' };
         char novoNomeImagem[200];
 
         snprintf(novoNomeImagem, sizeof novoNomeImagem, "imagens/%s/%s/%s_%s_l_%s.bmp", navio, orientacao, navio, parte, orientacao);
 
-// TODO: Fazer quando tiver pronto o BITMAP do Allegro
-        tabuleiro[0][linha][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
-        strcpy(tabuleiro[0][linha][coluna].nome_imagem, novoNomeImagem);
-        tabuleiro[0][linha][coluna].visivel = 1;
 
-        //textprintf(screen, font, 20, 110, makecol(255, 0, 0), "novoNomeImagem[60]: %s",novoNomeImagem);
-        //textprintf(screen, font, 20, 210, makecol(255, 0, 0), "navio: %s",navio);
-        //textprintf(screen, font, 20, 310, makecol(255, 0, 0), "orientacao: %s",orientacao);
+        tabuleiro[jogador][linha][coluna].imagem = load_bitmap(novoNomeImagem,NULL);
+        strcpy(tabuleiro[jogador][linha][coluna].nome_imagem, novoNomeImagem);
+        tabuleiro[jogador][linha][coluna].visivel = 1;
+
+        int n;
+        switch ( navio[1]){
+            case '1':n=0;break;
+            case '2':n=1;break;
+            case '3':n=2;break;
+            case '4':n=3;break;
+            case '5':n=4;break;
+        }
+
+        if(vez==0){
+            eu++;
+        }
+        else{
+            pc++;
+        }
+        //printf("\njogador: %d",vez);
+        //printf("\nnavio: %d",n);
+        //printf("\npartes acertadas: %d",navios[vez][n].partes_acertadas);
+        //printf("\nimagem: %s\n",novoNomeImagem);
 
     }
     else{
-// TODO: Fazer quando tiver pronto o BITMAP do Allegro
-        tabuleiro[0][linha][coluna].imagem = load_bitmap("imagens/tabuleiro/q_la.bmp",NULL);
-        strcpy(tabuleiro[0][linha][coluna].nome_imagem, "imagens/tabuleiro/q_la.bmp");
+        tabuleiro[jogador][linha][coluna].imagem = load_bitmap("imagens/tabuleiro/q_la2.bmp",NULL);
+        strcpy(tabuleiro[jogador][linha][coluna].nome_imagem, "imagens/tabuleiro/q_la2.bmp");
+        tabuleiro[jogador][linha][coluna].visivel = 1;
+        //printf("imagens/tabuleiro/q_la2.bmp");
     }
     //imprime_tabuleiro();
+}
+
+
+int ataqueComputador(){
+    int valida,linha,coluna,at;
+    at = 0;
+    while(at == 0){
+        randomQuadrante();
+        //printf("%s",quadrante);
+        valida = validaQuadrante(quadrante);
+
+        if(valida == 1){
+            linha = retornaLinha(quadrante);
+            coluna = retornaColuna(quadrante);
+            if(tabuleiro[0][linha][coluna].visivel==0){
+                ataque(quadrante,0);
+                at = 1;
+            }
+        }
+    }
 }
 
 void inicia_navio(){
@@ -756,8 +985,6 @@ void inicia_navio(){
     for(i=0;i<2;i++){
         for(j=0;j<5;j++){
             strcpy(navios[i][j].nome_navio,nome_navio[j]);
-            navios[i][j].partes_acertadas = 0;
-            navios[i][j].destruido = 0;
             navios[i][j].adicionado = 0;
         }
     }
@@ -769,6 +996,7 @@ void inicia_navio(){
 }
 int main()
 {
+    cont_q = 0;
     init();
     fundo_jogo();
     strcpy(nome_navio[0],"N1");strcpy(nome_navio[1],"N2");strcpy(nome_navio[2],"N3");strcpy(nome_navio[3],"N4");strcpy(nome_navio[4],"N5");
@@ -776,21 +1004,26 @@ int main()
     //int add;
     tabuleiro_padrao(0); //tabuleiro do jogador
     tabuleiro_padrao(1); //tabuleiro do computador
+
     inicia_navio();
-
-    //printf("rand_letra %c",rand_letras[r_l]);
-    //printf("rand_numero %c",rand_numeros[r_n]);
-    //printf("\nr_l %d",r_l);
-    //printf("\nr_n %d",r_n);
-    //printf("quadrante: %s",quadrante);
-
+    posicionarNaviosComputador();
+    //imprime_tabuleiro(1,0);
+    //rest(5000);
+    //tela_ataque();
+    //char q[3];
+    //randomQuadrante();
+    //printf("%s",quadrante);
+    //randomQuadrante();
+    //printf("\n%s",quadrante);
+    //randomQuadrante();
+    //printf("\n%s",quadrante);
+    //randomQuadrante();
+    //printf("\n%s",quadrante);
+    //randomQuadrante();
+    //printf("\n%s",quadrante);
     tela_inicial();
-    //lendo_string(navio,3,235,510);
-    //lendo_string(quadrante,3,235,540);
-    //lendo_string(orientacao,3,235,570);
-    //add = posicionaNavio();
 
-    //posicionarNaviosComputador();
+    //tela_ataque();
 	deinit();
 	return 0;
 
